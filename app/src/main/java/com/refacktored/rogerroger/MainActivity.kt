@@ -2,6 +2,7 @@ package com.refacktored.rogerroger
 
 import android.os.Bundle
 import android.os.StrictMode
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -13,9 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.refacktored.rogerroger.data.SearchResponse
 import com.refacktored.rogerroger.repositories.SearchRepository
 import com.refacktored.rogerroger.ui.theme.RogerRogerTheme
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import timber.log.Timber
 
 class MainActivity : ComponentActivity(), SearchListener {
@@ -24,16 +30,30 @@ class MainActivity : ComponentActivity(), SearchListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AndroidThreeTen.init(this)
+
+        // TODO - use this time stuff to add a time field to the response once koin fixes the api trash
+        try {
+            val localTime: ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())
+            // Convert Local Time to UTC
+            val utcTime: OffsetDateTime =
+                localTime.toOffsetDateTime().withOffsetSameInstant(ZoneOffset.UTC)
+            Toast.makeText(applicationContext,"Local:$localTime",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,"--> UTCTime:$utcTime",Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         //TODO - fixme - this is actually garabage
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         setContent {
             RogerRogerTheme {
+
                 MainScreen(mainViewModel = mainViewModel)
 
                 val searchRepo = SearchRepository()
                 val response = searchRepo.userSearch("kc8tnt")
-                // TODO - add a textfield search bar so user can input callsigns
+                // TODO - make search bar actually work and search callsigns api
                 Surface(modifier = Modifier.padding(top = 56.dp), color = MaterialTheme.colors.background) {
                     val results = response.blockingGet()
                     Column {
