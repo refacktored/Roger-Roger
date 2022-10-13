@@ -18,6 +18,9 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import com.refacktored.rogerroger.data.SearchResponse
 import com.refacktored.rogerroger.repositories.SearchRepository
 import com.refacktored.rogerroger.ui.theme.RogerRogerTheme
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
@@ -30,7 +33,24 @@ class MainActivity : ComponentActivity(), SearchListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /*
+        val appModule = module {
+            single { MyApi(get()) }
+            single<SearchResponse> { MyApi().userSearch("kc8tnt")
+        }*/
+
+        startKoin {
+            // Log Koin into Android logger
+            androidLogger()
+            // Reference Android context
+            androidContext(this@MainActivity)
+            // Load modules
+            // modules(myAppModules) // TODO  - actually use koin, and setup modules
+        }
+
         AndroidThreeTen.init(this)
+
 
         // TODO - use this time stuff to add a time field to the response once koin fixes the api trash
         try {
