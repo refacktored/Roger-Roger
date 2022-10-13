@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.StrictMode
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -18,6 +19,9 @@ import com.refacktored.rogerroger.ui.theme.RogerRogerTheme
 import timber.log.Timber
 
 class MainActivity : ComponentActivity(), SearchListener {
+
+    private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //TODO - fixme - this is actually garabage
@@ -25,10 +29,12 @@ class MainActivity : ComponentActivity(), SearchListener {
         StrictMode.setThreadPolicy(policy)
         setContent {
             RogerRogerTheme {
+                MainScreen(mainViewModel = mainViewModel)
+
                 val searchRepo = SearchRepository()
                 val response = searchRepo.userSearch("kc8tnt")
                 // TODO - add a textfield search bar so user can input callsigns
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+                Surface(modifier = Modifier.padding(top = 56.dp), color = MaterialTheme.colors.background) {
                     val results = response.blockingGet()
                     Column {
                         TypeView(type = results.type.toString())
